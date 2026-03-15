@@ -10,7 +10,6 @@ __pycache__/
 .env
 .env.local
 .env.*.local
-*.md
 
 # Build outputs
 dist/
@@ -45,4 +44,3 @@ CLAUDE.md
 
 
 *.pkl
-*.json
