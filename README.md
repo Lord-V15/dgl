@@ -1,6 +1,6 @@
 # DGL — Dearest Gentle Reader
 
-A personal letter-writing app. Write letters now, deliver them later via email. Also has a photo gallery and a relationship timeline.
+A personal letter-writing app. Write letters now, deliver them later to your email. Also has quotes from the shows that gave me the idea: Bridgerton, HIMYM, Before Trilogy and many more...
 
 ## What it does
 
