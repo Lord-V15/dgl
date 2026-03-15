@@ -40,6 +40,18 @@ async def get_current_user(
 
 @router.post("/verify", response_model=TokenResponse)
 async def verify_password(body: PasswordVerify) -> TokenResponse:
+    if body.password != settings.SECRET_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password"
+        )
+    token = _create_token(
+        {"sub": "authenticated"}, timedelta(hours=TOKEN_EXPIRE_HOURS)
+    )
+    return TokenResponse(access_token=token)
+
+
+@router.post("/verify-memories", response_model=TokenResponse)
+async def verify_memories_password(body: PasswordVerify) -> TokenResponse:
     if body.password != settings.PHOTOS_PASSWORD:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password"

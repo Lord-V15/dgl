@@ -80,14 +80,14 @@ export default function PolaroidCard({ src, caption, date, index = 0 }: Polaroid
           <div className="absolute bottom-2 left-3 right-3">
             {caption && (
               <p
-                className="font-caveat text-base text-ink/60 truncate"
+                className="font-caveat text-base text-[#2C1810]/60 truncate"
                 style={{ transform: `rotate(${((index * 3) % 5) - 2}deg)` }}
               >
                 {caption}
               </p>
             )}
             {date && (
-              <p className="font-inter text-[10px] text-ink/25 mt-0.5">
+              <p className="font-inter text-[10px] text-[#2C1810]/25 mt-0.5">
                 {format(new Date(date), 'MMM d, yyyy')}
               </p>
             )}

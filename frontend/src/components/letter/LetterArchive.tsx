@@ -79,9 +79,9 @@ export default function LetterArchive({ filter = 'all' }: LetterArchiveProps) {
             <motion.div
               className="relative p-6 md:p-8 cursor-pointer gold-shimmer overflow-hidden"
               style={{
-                background: 'linear-gradient(145deg, rgba(255,253,245,0.8), rgba(240,230,206,0.5))',
+                background: 'var(--t-glass-bg)',
                 borderRadius: '1.5rem',
-                border: '1px solid rgba(212, 175, 55, 0.15)',
+                border: '1px solid var(--t-glass-border)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
                 filter: letter.status === 'sent' ? `sepia(${sepiaAmount}%)` : 'none',
               }}

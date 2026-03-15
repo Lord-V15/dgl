@@ -194,7 +194,7 @@ export default function AmbientToggle() {
 
   return (
     <motion.button
-      className="fixed bottom-6 right-6 z-40 glass w-12 h-12 flex items-center justify-center cursor-pointer border-none"
+      className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-40 glass w-12 h-12 flex items-center justify-center cursor-pointer border-none"
       style={{ borderRadius: '50%' }}
       onClick={toggle}
       whileHover={{ scale: 1.1 }}
@@ -202,7 +202,7 @@ export default function AmbientToggle() {
       aria-label={muted ? 'Unmute ambient piano' : 'Mute ambient piano'}
     >
       {muted ? (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2C1810" strokeWidth="1.5">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-ink/60">
           <path d="M11 5L6 9H2v6h4l5 4V5z" />
           <line x1="23" y1="9" x2="17" y2="15" />
           <line x1="17" y1="9" x2="23" y2="15" />
@@ -212,7 +212,7 @@ export default function AmbientToggle() {
           animate={ready ? { scale: [1, 1.15, 1] } : undefined}
           transition={{ repeat: Infinity, duration: 2 }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="1.5">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gold">
             <path d="M11 5L6 9H2v6h4l5 4V5z" />
             <path d="M15.54 8.46a5 5 0 010 7.07" />
           </svg>

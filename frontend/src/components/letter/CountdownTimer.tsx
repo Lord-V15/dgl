@@ -69,23 +69,13 @@ export default function CountdownTimer({
             className="flex flex-col items-center"
             variants={fadeInUp}
           >
-            <div
-              className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 flex items-center justify-center relative"
-              style={{
-                border: '1.5px solid rgba(212, 175, 55, 0.25)',
-                borderRadius: '50%',
-                background: 'rgba(255, 253, 245, 0.5)',
-                backdropFilter: 'blur(8px)',
-                boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.4), 0 2px 8px rgba(0,0,0,0.03)',
-              }}
-            >
+            <div className="glass w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 flex items-center justify-center relative rounded-full">
               {/* Decorative tick marks */}
               {[0, 90, 180, 270].map((deg) => (
                 <div
                   key={deg}
-                  className="absolute w-px h-1.5 bg-gold/20"
+                  className="absolute bg-gold/20"
                   style={{
-                    transform: `rotate(${deg}deg) translateY(-calc(50% - 2px))`,
                     top: deg === 0 ? '3px' : deg === 180 ? 'auto' : '50%',
                     bottom: deg === 180 ? '3px' : 'auto',
                     left: deg === 90 ? 'auto' : deg === 270 ? '3px' : '50%',
@@ -97,7 +87,7 @@ export default function CountdownTimer({
               ))}
 
               <motion.span
-                className="font-playfair text-2xl md:text-3xl font-bold text-ink"
+                className="font-playfair text-2xl md:text-3xl font-bold text-gold"
                 key={unit.value}
                 initial={{ y: -8, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}

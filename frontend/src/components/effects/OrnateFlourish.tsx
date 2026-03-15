@@ -23,10 +23,12 @@ export default function OrnateFlourish({
       }
     : {};
 
+  const filterStyle = { filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.12))' };
+
   if (variant === 'wide') {
     return (
       // @ts-expect-error - motion.div vs div
-      <Wrapper className={`flex items-center justify-center gap-3 ${className}`} {...wrapperProps}>
+      <Wrapper className={`flex items-center justify-center gap-3 ${className}`} style={filterStyle} {...wrapperProps}>
         <svg width="80" height="16" viewBox="0 0 80 16" fill="none">
           <path d="M78 8C70 8 65 2 55 2C45 2 42 8 35 8C28 8 25 2 15 2C8 2 2 8 2 8" stroke={color} strokeWidth="1" fill="none" />
           <path d="M78 8C70 8 65 14 55 14C45 14 42 8 35 8C28 8 25 14 15 14C8 14 2 8 2 8" stroke={color} strokeWidth="1" fill="none" />
@@ -44,7 +46,7 @@ export default function OrnateFlourish({
 
   return (
     // @ts-expect-error - motion.div vs div
-    <Wrapper className={`flex items-center justify-center gap-4 ${className}`} {...wrapperProps}>
+    <Wrapper className={`flex items-center justify-center gap-4 ${className}`} style={filterStyle} {...wrapperProps}>
       <div className="h-px flex-1 max-w-16" style={{ background: `linear-gradient(to right, transparent, ${color})` }} />
       <svg width="24" height="12" viewBox="0 0 24 12" fill="none">
         <path d="M2 6C5 2 8 2 12 6C16 10 19 10 22 6" stroke={color} strokeWidth="1" strokeLinecap="round" />

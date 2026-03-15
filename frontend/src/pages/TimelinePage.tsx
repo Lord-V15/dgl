@@ -6,6 +6,8 @@ import api from '../lib/api';
 import GlassCard from '../components/layout/GlassCard';
 import PageHeader from '../components/layout/PageHeader';
 import WaxSeal from '../components/effects/WaxSeal';
+import PhotoUpload from '../components/photos/PhotoUpload';
+import PolaroidGallery from '../components/photos/PolaroidGallery';
 import { slideInLeft, slideInRight } from '../hooks/useScrollAnimation';
 
 interface Milestone {
@@ -34,6 +36,12 @@ export default function TimelinePage() {
   const [needsAuth, setNeedsAuth] = useState(false);
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState(false);
+  const [memoriesUnlocked, setMemoriesUnlocked] = useState(false);
+  const [needsMemoriesAuth, setNeedsMemoriesAuth] = useState(false);
+  const [memoriesPassword, setMemoriesPassword] = useState('');
+  const [memoriesAuthError, setMemoriesAuthError] = useState(false);
+  const [memoriesRevealed, setMemoriesRevealed] = useState(false);
+  const [showMemoryUpload, setShowMemoryUpload] = useState(false);
   const [formData, setFormData] = useState({
     date: format(new Date(), 'yyyy-MM-dd'),
     title: '',
@@ -63,9 +71,28 @@ export default function TimelinePage() {
       setNeedsAuth(false);
       setPassword('');
       setAuthError(false);
+      setShowForm(true);
+      setMemoriesUnlocked(true);
     },
     onError: () => {
       setAuthError(true);
+    },
+  });
+
+  const authenticateMemories = useMutation({
+    mutationFn: async (pwd: string) => {
+      const { data } = await api.post<{ access_token: string }>('/auth/verify-memories', { password: pwd });
+      return data;
+    },
+    onSuccess: (data) => {
+      localStorage.setItem('dgl_token', data.access_token);
+      setNeedsMemoriesAuth(false);
+      setMemoriesPassword('');
+      setMemoriesAuthError(false);
+      setMemoriesRevealed(true);
+    },
+    onError: () => {
+      setMemoriesAuthError(true);
     },
   });
 
@@ -86,8 +113,7 @@ export default function TimelinePage() {
   });
 
   const handleAddClick = () => {
-    const hasToken = !!localStorage.getItem('dgl_token');
-    if (!hasToken) {
+    if (!memoriesUnlocked) {
       setNeedsAuth(true);
     } else {
       setShowForm(!showForm);
@@ -149,7 +175,7 @@ export default function TimelinePage() {
                     value={password}
                     onChange={(e) => { setPassword(e.target.value); setAuthError(false); }}
                     placeholder="Whisper the password..."
-                    className="w-full bg-cream/60 border border-gold/20 rounded-xl px-4 py-2.5 font-cormorant text-lg text-ink text-center outline-none focus:border-gold/50 transition-colors placeholder:text-ink/25"
+                    className="w-full bg-ivory/60 border border-gold/20 rounded-xl px-4 py-2.5 font-cormorant text-lg text-ink text-center outline-none focus:border-gold/50 transition-colors placeholder:text-ink/25"
                     animate={authError ? { x: [0, -8, 8, -6, 6, 0] } : {}}
                     transition={{ duration: 0.4 }}
                   />
@@ -203,7 +229,7 @@ export default function TimelinePage() {
                       value={formData.date}
                       onChange={(e) => setFormData((p) => ({ ...p, date: e.target.value }))}
                       required
-                      className="w-full bg-cream/60 border border-gold/20 rounded-xl px-4 py-2 font-cormorant text-lg text-ink outline-none focus:border-gold/50 transition-colors"
+                      className="w-full bg-ivory/60 border border-gold/20 rounded-xl px-4 py-2 font-cormorant text-lg text-ink outline-none focus:border-gold/50 transition-colors"
                     />
                   </div>
                   <div>
@@ -214,7 +240,7 @@ export default function TimelinePage() {
                       onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))}
                       required
                       placeholder="A chapter in our story"
-                      className="w-full bg-cream/60 border border-gold/20 rounded-xl px-4 py-2 font-cormorant text-lg text-ink outline-none focus:border-gold/50 transition-colors placeholder:text-ink/30"
+                      className="w-full bg-ivory/60 border border-gold/20 rounded-xl px-4 py-2 font-cormorant text-lg text-ink outline-none focus:border-gold/50 transition-colors placeholder:text-ink/30"
                     />
                   </div>
                   <div>
@@ -225,7 +251,7 @@ export default function TimelinePage() {
                       required
                       placeholder="Tell the story of this moment..."
                       rows={3}
-                      className="w-full bg-cream/60 border border-gold/20 rounded-xl px-4 py-2 font-cormorant text-lg text-ink outline-none focus:border-gold/50 transition-colors placeholder:text-ink/30 resize-y"
+                      className="w-full bg-ivory/60 border border-gold/20 rounded-xl px-4 py-2 font-cormorant text-lg text-ink outline-none focus:border-gold/50 transition-colors placeholder:text-ink/30 resize-y"
                     />
                   </div>
                   <motion.button
@@ -275,11 +301,11 @@ export default function TimelinePage() {
           <div className="relative">
             {/* Vine line — desktop center */}
             <div className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 hidden md:block">
-              <div className="w-[2px] h-full" style={{ background: 'linear-gradient(180deg, transparent, rgba(212,175,55,0.3) 10%, rgba(212,175,55,0.3) 90%, transparent)' }} />
+              <div className="w-[2px] h-full" style={{ background: `linear-gradient(180deg, transparent, var(--t-glass-border) 10%, var(--t-glass-border) 90%, transparent)` }} />
             </div>
             {/* Vine line — mobile left */}
             <div className="absolute left-6 top-0 bottom-0 md:hidden">
-              <div className="w-[2px] h-full" style={{ background: 'linear-gradient(180deg, transparent, rgba(212,175,55,0.3) 10%, rgba(212,175,55,0.3) 90%, transparent)' }} />
+              <div className="w-[2px] h-full" style={{ background: `linear-gradient(180deg, transparent, var(--t-glass-border) 10%, var(--t-glass-border) 90%, transparent)` }} />
             </div>
 
             <div className="space-y-16">
@@ -329,6 +355,98 @@ export default function TimelinePage() {
             </div>
           </div>
         )}
+        {/* Memories section — revealed after timeline auth */}
+        <AnimatePresence>
+          {memoriesUnlocked && (
+            <motion.div
+              initial={{ height: 0, opacity: 0, y: 20 }}
+              animate={{ height: 'auto', opacity: 1, y: 0 }}
+              exit={{ height: 0, opacity: 0, y: 20 }}
+              transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="overflow-hidden mt-20"
+            >
+              {/* Divider */}
+              <div className="h-px mb-16 bg-gradient-to-r from-transparent via-gold/30 to-transparent" />
+
+              {/* Section header */}
+              <div className="text-center mb-10">
+                <WaxSeal size={36} className="mb-3" />
+                <p className="font-playfair italic text-gold text-xl mb-1">
+                  A secret chapter has been unlocked
+                </p>
+                <p className="font-cormorant text-ink/50 text-lg">
+                  Our private memories await within.
+                </p>
+              </div>
+
+              {/* Memories password gate */}
+              {!memoriesRevealed ? (
+                <GlassCard className="max-w-sm mx-auto text-center" style={{ borderColor: 'rgba(212, 175, 55, 0.3)' }}>
+                  <p className="font-cormorant text-lg text-ink/50 mb-4">
+                    Enter the password to view our memories
+                  </p>
+                  <form onSubmit={(e) => { e.preventDefault(); authenticateMemories.mutate(memoriesPassword); }} className="space-y-3">
+                    <motion.input
+                      type="password"
+                      value={memoriesPassword}
+                      onChange={(e) => { setMemoriesPassword(e.target.value); setMemoriesAuthError(false); }}
+                      placeholder="Whisper the password..."
+                      className="w-full bg-ivory/60 border border-gold/20 rounded-xl px-4 py-2.5 font-cormorant text-lg text-ink text-center outline-none focus:border-gold/50 transition-colors placeholder:text-ink/25"
+                      animate={memoriesAuthError ? { x: [0, -8, 8, -6, 6, 0] } : {}}
+                      transition={{ duration: 0.4 }}
+                    />
+                    {memoriesAuthError && (
+                      <p className="font-inter text-sm text-rose/80">
+                        That wasn't quite right. Try again.
+                      </p>
+                    )}
+                    <motion.button
+                      type="submit"
+                      disabled={authenticateMemories.isPending || !memoriesPassword}
+                      className="w-full bg-gradient-to-r from-gold/80 to-gold text-cream font-playfair py-2.5 rounded-full border-none cursor-pointer disabled:opacity-50"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {authenticateMemories.isPending ? 'Verifying...' : 'Unlock Memories'}
+                    </motion.button>
+                  </form>
+                </GlassCard>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {/* Add memory toggle */}
+                  <div className="text-center mb-10">
+                    <motion.button
+                      onClick={() => setShowMemoryUpload(!showMemoryUpload)}
+                      className="border border-gold/30 bg-transparent text-gold font-cormorant text-lg px-6 py-2.5 rounded-full cursor-pointer"
+                      whileHover={{ borderColor: 'rgba(212, 175, 55, 0.6)', backgroundColor: 'rgba(212, 175, 55, 0.05)' }}
+                    >
+                      {showMemoryUpload ? 'Cancel' : '+ Add a memory'}
+                    </motion.button>
+                  </div>
+
+                  <AnimatePresence>
+                    {showMemoryUpload && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden mb-10"
+                      >
+                        <PhotoUpload onUploaded={() => setShowMemoryUpload(false)} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <PolaroidGallery />
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
