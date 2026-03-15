@@ -33,7 +33,7 @@ export default function PasswordGate({ onAuthenticated }: PasswordGateProps) {
     <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{
-        background: 'linear-gradient(180deg, #FFFDF5 0%, #F0E6CE 100%)',
+        background: 'linear-gradient(180deg, var(--color-cream) 0%, var(--color-parchment) 100%)',
         backdropFilter: 'blur(8px)',
       }}
       initial={{ opacity: 0 }}
@@ -57,7 +57,7 @@ export default function PasswordGate({ onAuthenticated }: PasswordGateProps) {
           <svg width="100" height="120" viewBox="0 0 100 120" fill="none" className="mx-auto">
             {/* Book cover */}
             <rect x="15" y="10" width="70" height="100" rx="4" fill="#8B4513" opacity="0.15" stroke="rgba(212,175,55,0.3)" strokeWidth="1" />
-            <rect x="18" y="13" width="64" height="94" rx="3" fill="#F5ECD7" stroke="rgba(212,175,55,0.2)" strokeWidth="0.5" />
+            <rect x="18" y="13" width="64" height="94" rx="3" fill="var(--color-ivory)" stroke="rgba(212,175,55,0.2)" strokeWidth="0.5" />
             {/* Spine */}
             <rect x="15" y="10" width="6" height="100" rx="2" fill="rgba(139,69,19,0.1)" />
             {/* Gold clasp */}
@@ -105,7 +105,7 @@ export default function PasswordGate({ onAuthenticated }: PasswordGateProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Whisper the password..."
-            className="w-full bg-cream/60 border border-gold/20 rounded-xl px-4 py-3 font-cormorant text-lg text-ink text-center outline-none focus:border-gold/50 transition-colors duration-300 placeholder:text-ink/25 mb-4"
+            className="w-full bg-ivory/60 border border-gold/20 rounded-xl px-4 py-3 font-cormorant text-lg text-ink text-center outline-none focus:border-gold/50 transition-colors duration-300 placeholder:text-ink/25 mb-4"
             animate={authenticate.isError ? { x: [0, -8, 8, -6, 6, 0] } : {}}
             transition={{ duration: 0.4 }}
           />

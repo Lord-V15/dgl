@@ -19,7 +19,7 @@ export default function WaxSeal({ size = 64, className = '', animate = false }: 
 
   return (
     // @ts-expect-error - motion.div vs div prop types
-    <Wrapper className={`inline-block ${className}`} {...wrapperProps}>
+    <Wrapper className={`inline-block ${className}`} style={{ filter: 'drop-shadow(0 0 20px rgba(139,0,0,0.25))' }} {...wrapperProps}>
       <svg
         width={size}
         height={showDrips ? size * 1.15 : size}

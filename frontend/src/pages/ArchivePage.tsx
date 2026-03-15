@@ -44,7 +44,7 @@ export default function ArchivePage() {
               {filter === tab.value && (
                 <motion.div
                   className="absolute bottom-0 left-1/4 right-1/4 h-[1.5px]"
-                  style={{ background: 'linear-gradient(90deg, transparent, #D4AF37, transparent)' }}
+                  style={{ background: 'linear-gradient(90deg, transparent, var(--color-gold), transparent)' }}
                   layoutId="filter-tab"
                   transition={{ duration: 0.3 }}
                 />

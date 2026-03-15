@@ -26,31 +26,99 @@
   --font-inter: 'Inter', sans-serif;
 }
 
-:root {
-  --gold: #D4AF37;
-  --cream: #FFFDF5;
-  --ivory: #F5ECD7;
-  --blush: #F4C2C2;
-  --sage: #BCB88A;
-  --lavender: #C4B7D5;
-  --ink: #2C1810;
-  --glass-bg: rgba(255, 253, 245, 0.45);
-  --glass-border: rgba(212, 175, 55, 0.2);
+/* ── Dark theme (Midnight Garden) — default ── */
+:root, [data-theme="dark"] {
+  --color-gold: #D4AF37;
+  --color-gold-light: #F0D875;
+  --color-gold-dark: #B8941F;
+  --color-cream: #0B0F1A;
+  --color-ivory: #2A2E3A;
+  --color-parchment: #1E2230;
+  --color-blush: #D4929E;
+  --color-rose: #C77D8A;
+  --color-lavender: #9B8CB5;
+  --color-ink: #F0EBE1;
+  --color-ink-light: rgba(240,235,225,0.55);
+  --color-glass-bg: rgba(20,24,37,0.55);
+  --color-glass-border: rgba(212,175,55,0.12);
+  --color-seal: #8B0000;
+  --color-sage: #BCB88A;
+  --color-sage-deep: #8A9A6C;
+
+  --t-base: #0B0F1A;
+  --t-surface: #141825;
+  --t-surface-hover: #1C2236;
+  --t-text: #F0EBE1;
+  --t-text-secondary: rgba(240,235,225,0.55);
+  --t-gold: #D4AF37;
+  --t-gold-bright: #F0D875;
+  --t-gold-dark: #B8941F;
+  --t-rose: #C77D8A;
+  --t-blush: #D4929E;
+  --t-lavender: #9B8CB5;
+  --t-ivory: #2A2E3A;
+  --t-parchment: #1E2230;
+  --t-glass-bg: rgba(20,24,37,0.55);
+  --t-glass-border: rgba(212,175,55,0.12);
+  --t-seal: #8B0000;
+  --t-glow-rose: rgba(199,125,138,0.07);
+  --t-glow-gold: rgba(212,175,55,0.05);
+  --t-glow-lavender: rgba(155,140,181,0.05);
+}
+
+/* ── Light theme (Golden Hour) ── */
+[data-theme="light"] {
+  --color-gold: #C9950C;
+  --color-gold-light: #E8D48B;
+  --color-gold-dark: #A67B00;
+  --color-cream: #FFF8EC;
+  --color-ivory: #F5ECD7;
+  --color-parchment: #F0E6CE;
+  --color-blush: #F4C2C2;
+  --color-rose: #D4A0A0;
+  --color-lavender: #C4B7D5;
+  --color-ink: #2C1810;
+  --color-ink-light: #5C4033;
+  --color-glass-bg: rgba(255,248,236,0.55);
+  --color-glass-border: rgba(201,149,12,0.18);
+  --color-seal: #8B0000;
+  --color-sage: #BCB88A;
+  --color-sage-deep: #8A9A6C;
+
+  --t-base: #FFF8EC;
+  --t-surface: #FFF5E1;
+  --t-surface-hover: #FFEDCC;
+  --t-text: #2C1810;
+  --t-text-secondary: rgba(44,24,16,0.55);
+  --t-gold: #C9950C;
+  --t-gold-bright: #E8D48B;
+  --t-gold-dark: #A67B00;
+  --t-rose: #D4A0A0;
+  --t-blush: #F4C2C2;
+  --t-lavender: #C4B7D5;
+  --t-ivory: #F5ECD7;
+  --t-parchment: #F0E6CE;
+  --t-glass-bg: rgba(255,248,236,0.55);
+  --t-glass-border: rgba(201,149,12,0.18);
+  --t-seal: #8B0000;
+  --t-glow-rose: rgba(244,194,194,0.06);
+  --t-glow-gold: rgba(201,149,12,0.04);
+  --t-glow-lavender: rgba(196,183,213,0.05);
 }
 
 body {
   margin: 0;
-  background-color: var(--cream);
+  background-color: var(--color-cream);
   font-family: 'Cormorant Garamond', serif;
-  color: var(--ink);
+  color: var(--color-ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Parchment texture via SVG noise + radial accents */
+  transition: background-color 0.4s ease, color 0.4s ease;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"),
-    radial-gradient(ellipse at 15% 10%, rgba(212, 175, 55, 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse at 85% 80%, rgba(196, 183, 213, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(244, 194, 194, 0.03) 0%, transparent 60%);
+    radial-gradient(ellipse at 20% 30%, var(--t-glow-rose), transparent 50%),
+    radial-gradient(ellipse at 80% 20%, var(--t-glow-gold), transparent 50%),
+    radial-gradient(ellipse at 60% 80%, var(--t-glow-lavender), transparent 50%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -72,11 +140,16 @@ body {
     content: '';
     position: fixed;
     inset: 14px;
-    border: 1px solid rgba(212, 175, 55, 0.12);
+    border: 1px solid rgba(212, 175, 55, 0.10);
     border-radius: 4px;
     pointer-events: none;
     z-index: 60;
-    box-shadow: inset 0 0 0 3px var(--cream), inset 0 0 0 4px rgba(212, 175, 55, 0.08);
+    box-shadow: inset 0 0 0 3px var(--color-cream), inset 0 0 0 4px rgba(212, 175, 55, 0.08);
+    transition: box-shadow 0.4s ease;
+  }
+
+  #root {
+    padding: 14px;
   }
 }
 
@@ -87,9 +160,16 @@ body {
 /* ── Glass card ── */
 .glass {
   backdrop-filter: blur(16px);
-  background: rgba(255, 253, 245, 0.5);
-  border: 1px solid rgba(212, 175, 55, 0.18);
+  background: var(--t-glass-bg);
+  border: 1px solid var(--t-glass-border);
   border-radius: 1.5rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 2px rgba(255, 255, 255, 0.06);
+  transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+[data-theme="light"] .glass {
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.05),
     inset 0 1px 2px rgba(255, 255, 255, 0.4);
@@ -103,7 +183,7 @@ body {
   line-height: 0.8;
   padding-right: 0.12em;
   padding-top: 0.05em;
-  color: var(--gold);
+  color: var(--color-gold);
   font-weight: 700;
 }
 
@@ -146,17 +226,17 @@ body {
   width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--cream);
+  background: var(--color-cream);
 }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--gold), #B8941F);
+  background: linear-gradient(180deg, var(--color-gold), var(--color-gold-dark));
   border-radius: 3px;
 }
 
 /* ── Selection color ── */
 ::selection {
-  background: rgba(212, 175, 55, 0.2);
-  color: var(--ink);
+  background: rgba(212, 175, 55, 0.25);
+  color: var(--color-ink);
 }
 
 /* ── Link underline animation ── */
@@ -171,7 +251,7 @@ body {
   left: 0;
   width: 0;
   height: 1px;
-  background: var(--gold);
+  background: var(--color-gold);
   transition: width 0.3s ease;
 }
 .link-animate:hover::after {
@@ -181,7 +261,7 @@ body {
 /* ── Stationery lines for letter textarea ── */
 .stationery-lines {
   background-image:
-    linear-gradient(transparent, transparent 31px, rgba(212, 175, 55, 0.08) 31px, rgba(212, 175, 55, 0.08) 32px);
+    linear-gradient(transparent, transparent 31px, var(--t-glass-border) 31px, var(--t-glass-border) 32px);
   background-size: 100% 32px;
 }
 

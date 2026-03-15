@@ -101,7 +101,7 @@ export default function LetterComposer() {
         <div
           className="deckled-edge relative p-8 md:p-12"
           style={{
-            background: 'linear-gradient(145deg, rgba(255, 253, 245, 0.9), rgba(240, 230, 206, 0.7))',
+            background: 'linear-gradient(145deg, var(--t-glass-bg), var(--color-parchment))',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 2px rgba(255,255,255,0.5)',
           }}
         >

@@ -1,3 +1,4 @@
+import { useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
@@ -8,6 +9,7 @@ interface GlassCardProps {
   onClick?: () => void;
   variant?: 'default' | 'parchment';
   flourish?: boolean;
+  tilt?: boolean;
 }
 
 const cardVariants = {
@@ -22,12 +24,6 @@ const cardVariants = {
   },
 };
 
-const parchmentStyle = {
-  background: 'linear-gradient(145deg, #F5ECD7, #F0E6CE)',
-  borderRadius: '0.5rem',
-  boxShadow: '0 4px 20px rgba(0,0,0,0.06), inset 0 1px 2px rgba(255,255,255,0.5)',
-};
-
 export default function GlassCard({
   children,
   className = '',
@@ -35,30 +31,57 @@ export default function GlassCard({
   onClick,
   variant = 'default',
   flourish = false,
+  tilt = false,
 }: GlassCardProps) {
   const isParchment = variant === 'parchment';
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tiltStyle, setTiltStyle] = useState({ rotateX: 0, rotateY: 0 });
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!tilt || !cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTiltStyle({ rotateX: -y * 8, rotateY: x * 8 });
+  }, [tilt]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (tilt) setTiltStyle({ rotateX: 0, rotateY: 0 });
+  }, [tilt]);
 
   return (
     <motion.div
+      ref={cardRef}
       className={`${isParchment ? 'deckled-edge' : 'glass'} p-6 md:p-8 relative gold-shimmer ${className}`}
       style={{
-        ...(isParchment ? parchmentStyle : {}),
+        ...(isParchment ? {
+          background: 'linear-gradient(145deg, var(--color-ivory), var(--color-parchment))',
+          borderRadius: '0.5rem',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.06), inset 0 1px 2px rgba(255,255,255,0.5)',
+        } : {}),
         cursor: onClick ? 'pointer' : undefined,
+        perspective: tilt ? 800 : undefined,
       }}
       variants={cardVariants}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: '-30px' }}
+      animate={tilt ? {
+        rotateX: tiltStyle.rotateX,
+        rotateY: tiltStyle.rotateY,
+      } : undefined}
       whileHover={
         hover
           ? {
               y: -4,
-              boxShadow: '0 12px 40px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(212, 175, 55, 0.3)',
+              boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12), 0 0 30px rgba(212, 175, 55, 0.08), 0 0 0 1px rgba(212, 175, 55, 0.3)',
             }
           : undefined
       }
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.3, type: tilt ? 'spring' : 'tween', stiffness: 300, damping: 20 }}
       onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
       {flourish && (
         <>

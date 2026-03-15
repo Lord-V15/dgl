@@ -35,6 +35,7 @@ class EmailService:
             self._client.send_email(
                 Source=settings.SES_SENDER_EMAIL,
                 Destination={"ToAddresses": [letter.recipient_email]},
+                ReplyToAddresses=["vibhansh@novyte.in"],
                 Message={
                     "Subject": {
                         "Data": letter.subject,
