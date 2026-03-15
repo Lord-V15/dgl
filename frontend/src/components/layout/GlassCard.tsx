@@ -10,6 +10,7 @@ interface GlassCardProps {
   variant?: 'default' | 'parchment';
   flourish?: boolean;
   tilt?: boolean;
+  style?: React.CSSProperties;
 }
 
 const cardVariants = {
@@ -32,6 +33,7 @@ export default function GlassCard({
   variant = 'default',
   flourish = false,
   tilt = false,
+  style: externalStyle,
 }: GlassCardProps) {
   const isParchment = variant === 'parchment';
   const cardRef = useRef<HTMLDivElement>(null);
@@ -61,6 +63,7 @@ export default function GlassCard({
         } : {}),
         cursor: onClick ? 'pointer' : undefined,
         perspective: tilt ? 800 : undefined,
+        ...externalStyle,
       }}
       variants={cardVariants}
       initial="hidden"

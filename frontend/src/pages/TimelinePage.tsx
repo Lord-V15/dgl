@@ -37,7 +37,6 @@ export default function TimelinePage() {
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState(false);
   const [memoriesUnlocked, setMemoriesUnlocked] = useState(false);
-  const [needsMemoriesAuth, setNeedsMemoriesAuth] = useState(false);
   const [memoriesPassword, setMemoriesPassword] = useState('');
   const [memoriesAuthError, setMemoriesAuthError] = useState(false);
   const [memoriesRevealed, setMemoriesRevealed] = useState(false);

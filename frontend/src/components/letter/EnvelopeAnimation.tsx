@@ -57,8 +57,7 @@ export default function EnvelopeAnimation({ isVisible, onComplete }: EnvelopeAni
             {/* Letter folding */}
             <motion.div
               className="w-72 rounded-lg p-6 shadow-lg border border-gold/10"
-              style={{ background: 'linear-gradient(145deg, #FFFDF5, #F0E6CE)' }}
-              style={{ transformOrigin: 'bottom' }}
+              style={{ background: 'linear-gradient(145deg, #FFFDF5, #F0E6CE)', transformOrigin: 'bottom' }}
               animate={{
                 scaleY: phase === 'fold' ? 1 : 0,
                 opacity: phase === 'fold' ? 1 : 0,
@@ -100,7 +99,7 @@ export default function EnvelopeAnimation({ isVisible, onComplete }: EnvelopeAni
                       strokeWidth="1"
                       style={{ originY: 0, originX: '50%' }}
                       animate={{
-                        rotateX: phase !== 'fold' ? 180 : 0,
+                        rotateX: phase === 'close' || phase === 'seal' || phase === 'fly' ? 180 : 0,
                       }}
                       transition={{ duration: 0.5, ease: 'easeInOut' }}
                     />
