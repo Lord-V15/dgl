@@ -108,6 +108,8 @@ function AnimatedText({ text, baseDelay, className = '', charStyle }: { text: st
   );
 }
 
+const isProd = import.meta.env.VITE_SERVER === 'prod';
+
 export default function HomePage() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -346,7 +348,7 @@ export default function HomePage() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {featureCards.map((card) => (
+          {featureCards.filter((card) => !isProd || card.link !== '/archive').map((card) => (
             <motion.div key={card.title} variants={fadeInUp}>
               <Link to={card.link} className="no-underline block">
                 <GlassCard hover flourish tilt className="h-full text-center relative overflow-hidden">

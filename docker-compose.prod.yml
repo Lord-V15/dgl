@@ -11,7 +11,10 @@ services:
     restart: unless-stopped
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        - VITE_SERVER=prod
     ports:
       - "127.0.0.1:3000:80"
     depends_on:

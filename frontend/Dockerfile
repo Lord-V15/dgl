@@ -6,6 +6,8 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+ARG VITE_SERVER
+ENV VITE_SERVER=$VITE_SERVER
 RUN npm run build
 
 FROM nginx:alpine
