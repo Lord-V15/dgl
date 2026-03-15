@@ -85,7 +85,6 @@ export default function TimelinePage() {
     },
     onSuccess: (data) => {
       localStorage.setItem('dgl_token', data.access_token);
-      setNeedsMemoriesAuth(false);
       setMemoriesPassword('');
       setMemoriesAuthError(false);
       setMemoriesRevealed(true);
