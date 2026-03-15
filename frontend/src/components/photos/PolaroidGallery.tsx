@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../lib/api';
 import PolaroidCard from './PolaroidCard';
 
@@ -13,12 +13,19 @@ interface Photo {
 }
 
 export default function PolaroidGallery() {
+  const queryClient = useQueryClient();
+
   const { data: photos = [], isLoading } = useQuery({
     queryKey: ['photos'],
     queryFn: async () => {
       const { data } = await api.get<Photo[]>('/photos');
       return data;
     },
+  });
+
+  const deletePhoto = useMutation({
+    mutationFn: (id: string) => api.delete(`/photos/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['photos'] }),
   });
 
   if (isLoading) {
@@ -62,6 +69,8 @@ export default function PolaroidGallery() {
             caption={photo.caption}
             date={photo.taken_date}
             index={index}
+            onDelete={() => { if (confirm('Delete this memory?')) deletePhoto.mutate(photo.id); }}
+            isDeleting={deletePhoto.isPending}
           />
         </motion.div>
       ))}

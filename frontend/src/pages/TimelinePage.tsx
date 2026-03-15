@@ -96,6 +96,14 @@ export default function TimelinePage() {
     },
   });
 
+  const deleteMilestone = useMutation({
+    mutationFn: (id: string) => api.delete(`/timeline/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['milestones'] }),
+    onError: (err: any) => {
+      if (err?.response?.status === 401) setNeedsAuth(true);
+    },
+  });
+
   const addMilestone = useMutation({
     mutationFn: (data: typeof formData) =>
       api.post('/timeline', { title: data.title, description: data.description, milestone_date: data.date }),
@@ -326,10 +334,22 @@ export default function TimelinePage() {
                     viewport={{ once: true, margin: '-50px' }}
                   >
                     <div className={`flex-1 ${isLeft ? 'md:text-right' : 'md:text-left'} pl-14 md:pl-0`}>
-                      <GlassCard className="inline-block text-left relative overflow-hidden">
+                      <GlassCard className="inline-block text-left relative overflow-hidden group">
                         <span className="absolute top-3 right-4 font-playfair text-5xl font-bold text-gold/[0.06] select-none">
                           {chapter}
                         </span>
+                        {memoriesUnlocked && (
+                          <button
+                            className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center rounded-full text-ink/20 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer disabled:opacity-50"
+                            onClick={() => { if (confirm('Delete this chapter?')) deleteMilestone.mutate(milestone.id); }}
+                            disabled={deleteMilestone.isPending}
+                            title="Delete chapter"
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                              <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                            </svg>
+                          </button>
+                        )}
                         <p className="font-inter text-xs text-gold uppercase tracking-widest mb-2">
                           {format(new Date(milestone.milestone_date), 'MMMM d, yyyy')}
                         </p>
