@@ -26,6 +26,13 @@ class LetterCreate(BaseModel):
     delivery_date: date
 
 
+class LetterSendNow(BaseModel):
+    recipient_email: str
+    sender_name: str
+    subject: str
+    body: str
+
+
 class LetterResponse(BaseModel):
     id: str
     recipient_email: str

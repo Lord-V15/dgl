@@ -4,12 +4,10 @@ import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-
 import { useTheme } from '../../context/ThemeContext';
 import WaxSeal from '../effects/WaxSeal';
 
-const isProd = import.meta.env.VITE_SERVER === 'prod';
-
 const navLinks = [
   { to: '/', label: 'Home' },
   { to: '/write', label: 'Write' },
-  ...(!isProd ? [{ to: '/archive', label: 'Archive' }] : []),
+  { to: '/archive', label: 'Archive' },
   { to: '/timeline', label: 'Our Story' },
 ];
 

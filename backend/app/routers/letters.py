@@ -1,4 +1,4 @@
-from datetime import date, timezone
+from datetime import date, datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
@@ -6,7 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models import Letter
-from app.schemas import LetterCreate, LetterResponse
+from app.routers.auth import get_current_user
+from app.schemas import LetterCreate, LetterResponse, LetterSendNow
+from app.services.email_service import EmailService
 
 router = APIRouter(prefix="/api/letters", tags=["letters"])
 
@@ -28,6 +30,38 @@ async def create_letter(
         delivery_date=body.delivery_date,
     )
     db.add(letter)
+    await db.flush()
+    await db.refresh(letter)
+    return letter
+
+
+@router.post("/send-now", response_model=LetterResponse, status_code=status.HTTP_201_CREATED)
+async def send_letter_now(
+    body: LetterSendNow,
+    db: AsyncSession = Depends(get_db),
+    _user: dict = Depends(get_current_user),
+) -> Letter:
+    letter = Letter(
+        recipient_email=body.recipient_email,
+        sender_name=body.sender_name,
+        subject=body.subject,
+        body=body.body,
+        delivery_date=date.today(),
+    )
+    db.add(letter)
+    await db.flush()
+    await db.refresh(letter)
+
+    email_service = EmailService()
+    success = email_service.send_letter(letter)
+    if not success:
+        letter.status = "failed"
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Failed to send email. Letter saved as failed.",
+        )
+    letter.status = "sent"
+    letter.sent_at = datetime.now(timezone.utc)
     await db.flush()
     await db.refresh(letter)
     return letter

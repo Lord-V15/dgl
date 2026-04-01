@@ -28,8 +28,6 @@ const pageTransition = {
   transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] as const },
 };
 
-const isProd = import.meta.env.VITE_SERVER === 'prod';
-
 function AnimatedRoutes() {
   const location = useLocation();
 
@@ -39,7 +37,7 @@ function AnimatedRoutes() {
         <Routes location={location}>
           <Route path="/" element={<HomePage />} />
           <Route path="/write" element={<WriteLetterPage />} />
-          {!isProd && <Route path="/archive" element={<ArchivePage />} />}
+          <Route path="/archive" element={<ArchivePage />} />
           <Route path="/memories" element={<MemoriesPage />} />
           <Route path="/timeline" element={<TimelinePage />} />
         </Routes>
