@@ -26,6 +26,10 @@ export default function LetterComposer() {
   });
   const [showAnimation, setShowAnimation] = useState(false);
   const [sent, setSent] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [secretKey, setSecretKey] = useState('');
+  const [unlocked, setUnlocked] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   const { displayText: placeholder } = useTypewriter({
     text: 'Dearest gentle reader...',
@@ -38,9 +42,35 @@ export default function LetterComposer() {
     onSuccess: () => setShowAnimation(true),
   });
 
+  const sendLetterNow = useMutation({
+    mutationFn: (data: LetterFormData) => {
+      const { delivery_date: _, ...payload } = data;
+      return api.post('/letters/send-now', payload);
+    },
+    onSuccess: () => setShowAnimation(true),
+  });
+
+  const handleUnlock = async () => {
+    setPasswordError('');
+    try {
+      const res = await api.post('/auth/verify', { password: secretKey });
+      localStorage.setItem('dgl_token', res.data.access_token);
+      setUnlocked(true);
+      setShowPasswordModal(false);
+      setSecretKey('');
+    } catch {
+      setPasswordError('Incorrect key');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     sendLetter.mutate(formData);
+  };
+
+  const handleSendNow = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendLetterNow.mutate(formData);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -215,21 +245,104 @@ export default function LetterComposer() {
           </div>
 
           {/* Submit */}
-          <motion.button
-            type="submit"
-            disabled={sendLetter.isPending}
-            className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-gold/80 to-gold text-cream font-playfair text-lg py-4 px-8 rounded-full border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden relative"
-            whileHover={{ scale: 1.02, boxShadow: '0 4px 20px rgba(212, 175, 55, 0.3)' }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <WaxSeal size={22} />
-            {sendLetter.isPending ? 'Sealing your letter...' : 'Seal & Send'}
-          </motion.button>
+          <div className="flex items-center gap-3">
+            <motion.button
+              type="submit"
+              disabled={sendLetter.isPending || sendLetterNow.isPending}
+              className="flex-1 flex items-center justify-center gap-3 bg-gradient-to-r from-gold/80 to-gold text-cream font-playfair text-lg py-4 px-8 rounded-full border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden relative"
+              whileHover={{ scale: 1.02, boxShadow: '0 4px 20px rgba(212, 175, 55, 0.3)' }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <WaxSeal size={22} />
+              {sendLetter.isPending ? 'Sealing your letter...' : 'Seal & Send'}
+            </motion.button>
 
-          {sendLetter.isError && (
+            {!unlocked ? (
+              <motion.button
+                type="button"
+                onClick={() => setShowPasswordModal(true)}
+                className="flex items-center justify-center w-12 h-12 rounded-full border border-gold/30 bg-transparent text-gold/60 cursor-pointer hover:bg-gold/10 hover:text-gold transition-colors duration-300"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                title="Unlock instant send"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </motion.button>
+            ) : (
+              <motion.button
+                type="button"
+                onClick={handleSendNow}
+                disabled={sendLetterNow.isPending || sendLetter.isPending}
+                className="flex-1 flex items-center justify-center gap-3 bg-gradient-to-r from-rose-500/80 to-rose-600 text-cream font-playfair text-lg py-4 px-8 rounded-full border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden relative"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ scale: 1.02, boxShadow: '0 4px 20px rgba(225, 29, 72, 0.3)' }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+                {sendLetterNow.isPending ? 'Sending now...' : 'Seal & Send Now'}
+              </motion.button>
+            )}
+          </div>
+
+          {(sendLetter.isError || sendLetterNow.isError) && (
             <p className="text-center text-red-600/70 font-inter text-sm mt-4">
               Failed to send letter. Please try again.
             </p>
+          )}
+
+          {/* Password Modal */}
+          {showPasswordModal && (
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onClick={() => { setShowPasswordModal(false); setPasswordError(''); setSecretKey(''); }}
+            >
+              <motion.div
+                className="glass p-8 rounded-2xl max-w-sm w-full mx-4 text-center"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-center mb-4">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-gold">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </div>
+                <h3 className="font-playfair text-xl text-ink mb-2">Unlock Instant Send</h3>
+                <p className="font-cormorant text-ink/50 mb-6">Enter the secret key to enable immediate delivery</p>
+                <input
+                  type="password"
+                  value={secretKey}
+                  onChange={(e) => setSecretKey(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleUnlock()}
+                  placeholder="Secret key"
+                  className="w-full bg-transparent border font-cormorant text-lg text-ink py-2.5 px-4 rounded-lg outline-none mb-3 placeholder:text-ink/25"
+                  style={{ borderColor: passwordError ? 'rgba(220, 38, 38, 0.5)' : 'rgba(212, 175, 55, 0.3)' }}
+                  autoFocus
+                />
+                {passwordError && (
+                  <p className="text-red-500/70 font-inter text-sm mb-3">{passwordError}</p>
+                )}
+                <motion.button
+                  type="button"
+                  onClick={handleUnlock}
+                  className="w-full font-playfair text-lg text-cream bg-gradient-to-r from-gold/80 to-gold py-3 px-6 rounded-full border-none cursor-pointer"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Unlock
+                </motion.button>
+              </motion.div>
+            </motion.div>
           )}
         </div>
       </motion.form>

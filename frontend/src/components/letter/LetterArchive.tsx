@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, differenceInDays } from 'date-fns';
 import api from '../../lib/api';
 import { staggerContainer, fadeInUp } from '../../hooks/useScrollAnimation';
@@ -9,9 +8,8 @@ interface Letter {
   id: string;
   sender_name: string;
   subject: string;
-  body: string;
   delivery_date: string;
-  status: 'pending' | 'sent';
+  status: 'pending' | 'sent' | 'failed';
   created_at: string;
 }
 
@@ -20,7 +18,7 @@ interface LetterArchiveProps {
 }
 
 export default function LetterArchive({ filter = 'all' }: LetterArchiveProps) {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const { data: letters = [], isLoading } = useQuery({
     queryKey: ['letters', filter],
@@ -28,6 +26,13 @@ export default function LetterArchive({ filter = 'all' }: LetterArchiveProps) {
       const params = filter !== 'all' ? { status: filter } : {};
       const { data } = await api.get<Letter[]>('/letters', { params });
       return data;
+    },
+  });
+
+  const cancelLetter = useMutation({
+    mutationFn: (id: string) => api.delete(`/letters/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['letters'] });
     },
   });
 
@@ -72,12 +77,11 @@ export default function LetterArchive({ filter = 'all' }: LetterArchiveProps) {
       {letters.map((letter) => {
         const daysSinceSent = differenceInDays(new Date(), new Date(letter.created_at));
         const sepiaAmount = Math.min(daysSinceSent * 2, 50);
-        const isExpanded = expandedId === letter.id;
 
         return (
           <motion.div key={letter.id} variants={fadeInUp}>
-            <motion.div
-              className="relative p-6 md:p-8 cursor-pointer gold-shimmer overflow-hidden"
+            <div
+              className="relative p-6 md:p-8 gold-shimmer overflow-hidden"
               style={{
                 background: 'var(--t-glass-bg)',
                 borderRadius: '1.5rem',
@@ -85,9 +89,6 @@ export default function LetterArchive({ filter = 'all' }: LetterArchiveProps) {
                 boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
                 filter: letter.status === 'sent' ? `sepia(${sepiaAmount}%)` : 'none',
               }}
-              onClick={() => setExpandedId(isExpanded ? null : letter.id)}
-              whileHover={{ y: -3, boxShadow: '0 8px 30px rgba(0,0,0,0.07)' }}
-              transition={{ duration: 0.2 }}
             >
               {/* Envelope flap decoration */}
               <div
@@ -106,46 +107,43 @@ export default function LetterArchive({ filter = 'all' }: LetterArchiveProps) {
                   className={`font-inter text-[10px] uppercase tracking-widest px-3 py-1 border rotate-[-3deg] shrink-0 ${
                     letter.status === 'sent'
                       ? 'border-sage-deep/40 text-sage-deep'
-                      : 'border-gold/40 text-gold'
+                      : letter.status === 'failed'
+                        ? 'border-red-400/40 text-red-500'
+                        : 'border-gold/40 text-gold'
                   }`}
                   style={{ borderStyle: 'dashed', borderRadius: '2px' }}
                 >
-                  {letter.status === 'sent' ? 'Delivered' : 'Pending'}
+                  {letter.status === 'sent' ? 'Delivered' : letter.status === 'failed' ? 'Failed' : 'Pending'}
                 </span>
               </div>
 
-              <p className="font-inter text-xs text-ink/35 mb-3 tracking-wide">
+              <p className="font-inter text-xs text-ink/35 mb-1 tracking-wide">
+                From {letter.sender_name}
+              </p>
+
+              <p className="font-inter text-xs text-ink/35 tracking-wide">
                 {letter.status === 'sent'
                   ? `Delivered ${format(new Date(letter.delivery_date), 'MMMM d, yyyy')}`
                   : `To be delivered ${format(new Date(letter.delivery_date), 'MMMM d, yyyy')}`}
               </p>
 
-              <p className="font-cormorant text-base text-ink/50 line-clamp-2">
-                {letter.body}
-              </p>
-
-              <AnimatePresence>
-                {isExpanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                    style={{ transformOrigin: 'top' }}
-                  >
-                    <div className="pt-5 mt-5" style={{ borderTop: '1px solid rgba(212,175,55,0.1)' }}>
-                      <p className="font-caveat text-lg text-ink whitespace-pre-wrap leading-relaxed">
-                        {letter.body}
-                      </p>
-                      <p className="font-cormorant text-sm text-ink/35 mt-5 italic">
-                        Written by {letter.sender_name}
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
+              {letter.status === 'pending' && (
+                <motion.button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('Cancel this letter? It will be permanently deleted.')) {
+                      cancelLetter.mutate(letter.id);
+                    }
+                  }}
+                  disabled={cancelLetter.isPending}
+                  className="mt-4 font-inter text-xs uppercase tracking-widest text-red-500/60 border border-red-400/20 bg-transparent px-4 py-1.5 rounded-full cursor-pointer hover:bg-red-500/10 hover:text-red-500 transition-colors duration-300 disabled:opacity-50"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Cancel Letter
+                </motion.button>
+              )}
+            </div>
           </motion.div>
         );
       })}
